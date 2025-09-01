@@ -1,27 +1,41 @@
-name: Dependency Submission
+# SPDX-License-Identifier: Apache-2.0
+name: Dependency Graph Submission
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - branch_9_0
+      - branch_9_1
+      - branch_9_2
+      - branch_9_3
+      - branch_9_4
+      - branch_9_5
+      - branch_9_6
+      - branch_9_7
+      - branch_9_8
+      - branch_9_9
+      - branch_9x
 
-permissions:
-  contents: write
+# Permissions are explicitly assigned at a job level.
+permissions: {}
 
 jobs:
   dependency-submission:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK
+        uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
           distribution: temurin
           java-version: 21
           
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v4
+        uses: gradle/actions/dependency-submission@017a9effdb900e5b5b2fddfb590a105619dca3c3 # v4.4.2
         env:
-          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: "(?i)(^|:)(compileClasspath|runtimeClasspath|testCompileClasspath|testRuntimeClasspath)$"
-          DEPENDENCY_GRAPH_EXCLUDE_CONFIGURATIONS: "(?i)(^|:)(classpath|.*PluginClasspath|kotlinCompilerClasspath|kaptClasspath|annotationProcessor|detachedConfiguration.*)$"
-          DEPENDENCY_GRAPH_RUNTIME_INCLUDE_CONFIGURATIONS: "(?i)(^|:)runtimeClasspath$"
-          DEPENDENCY_GRAPH_RUNTIME_EXCLUDE_CONFIGURATIONS: "(?i)(^|:)testRuntimeClasspath$"
+          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: "(?i)(test)?(compile|runtime)Classpath|startJar"
+          DEPENDENCY_GRAPH_RUNTIME_EXCLUDE_PROJECTS: ":solr:test-framework"
+          DEPENDENCY_GRAPH_RUNTIME_INCLUDE_CONFIGURATIONS: "runtimeClasspath|startJar"
