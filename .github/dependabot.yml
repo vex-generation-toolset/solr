@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: Apache-2.0
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"   # required but ignored if limit=0
+    target-branch: "main"
+    # Only creates PRs when there are security updates
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "branch_9x"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "branch_9_9"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "branch_9_8"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "branch_9_7"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "branch_9_6"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "branch_9_5"
+    open-pull-requests-limit: 0
