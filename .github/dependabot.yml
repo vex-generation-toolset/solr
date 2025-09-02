@@ -8,7 +8,8 @@ updates:
       interval: "weekly"   # required but ignored if limit=0
     target-branch: "main"
     # Only creates PRs when there are security updates
-    open-pull-requests-limit: 0
+    # Allow 1 PR to enable Dependabot
+    open-pull-requests-limit: 1
 
   - package-ecosystem: "gradle"
     directory: "/"
