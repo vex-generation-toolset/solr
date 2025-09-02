@@ -1,0 +1,44 @@
+{
+  "job": {
+    "allowed-updates": [
+      {
+        "dependency-type": "direct",
+        "update-type": "all"
+      }
+    ],
+    "commit-message-options": {
+      "prefix": null,
+      "prefix-development": null,
+      "include-scope": null
+    },
+    "credentials-metadata": [
+      {
+        "type": "git_source",
+        "host": "github.com"
+      }
+    ],
+    "debug": null,
+    "dependencies": null,
+    "dependency-groups": [],
+    "dependency-group-to-refresh": null,
+    "existing-pull-requests": [],
+    "existing-group-pull-requests": [],
+    "experiments": {
+      "record-ecosystem-versions": true,
+      "record-update-job-unknown-error": true,
+      "proxy-cached": true,
+      "move-job-token": true,
+      "dependency-change-validation": true,
+      "enable-file-parser-python-local": true,
+      "npm-fallback-version-above-v6": true,
+      "lead-security-dependency": true,
+      "enable-record-ecosystem-meta": true,
+      "enable-corepack-for-npm-and-yarn": true,
+      "enable-shared-helpers-command-timeout": true,
+      "enable-dependabot-setting-up-cronjob": true,
+      "enable-engine-version-detection": true,
+      "avoid-duplicate-updates-package-json": true,
+      "allow-refresh-for-existing-pr-dependencies": true
+    }
+  }
+}
