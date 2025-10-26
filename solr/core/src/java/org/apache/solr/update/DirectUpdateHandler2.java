@@ -437,7 +437,7 @@ public class DirectUpdateHandler2 extends UpdateHandler
       // Add to the transaction log *after* successfully adding to the
       // index, if there was no error.
       // This ordering ensures that if we log it, it's definitely been
-      // added to the the index.
+      // added to the index.
       // This also ensures that if a commit sneaks in-between, that we
       // know everything in a particular
       // log version was definitely committed.
@@ -729,9 +729,8 @@ public class DirectUpdateHandler2 extends UpdateHandler
       if (cmd.expungeDeletes) expungeDeleteCommands.mark();
     }
 
-    @SuppressWarnings("unchecked")
-    Future<Void>[] waitSearcher =
-        cmd.waitSearcher ? (Future<Void>[]) Array.newInstance(Future.class, 1) : null;
+    Future<?>[] waitSearcher =
+        cmd.waitSearcher ? (Future<?>[]) Array.newInstance(Future.class, 1) : null;
 
     boolean error = true;
     try {

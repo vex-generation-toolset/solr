@@ -189,7 +189,7 @@ public class Http2SolrClient extends HttpSolrClientBase {
 
   private void applyHttpClientBuilderFactory() {
     String factoryClassName =
-        System.getProperty(HttpClientUtil.SYS_PROP_HTTP_CLIENT_BUILDER_FACTORY);
+        System.getProperty(SolrHttpConstants.SYS_PROP_HTTP_CLIENT_BUILDER_FACTORY);
     if (factoryClassName != null) {
       log.debug("Using Http Builder Factory: {}", factoryClassName);
       HttpClientBuilderFactory factory;
@@ -1078,6 +1078,26 @@ public class Http2SolrClient extends HttpSolrClientBase {
       this.baseSolrUrl = baseSolrUrl;
     }
 
+    /**
+     * Specify listener factories, which will replace any existing values.
+     *
+     * @param listenerFactories a list of HttpListenerFactory instances
+     * @return This Builder
+     */
+    public Http2SolrClient.Builder withListenerFactories(
+        List<HttpListenerFactory> listenerFactories) {
+      this.listenerFactory = listenerFactories;
+      return this;
+    }
+
+    /**
+     * Specify listener factories, which will replace any existing values.
+     *
+     * @param listenerFactory a list of HttpListenerFactory instances
+     * @return This Builder
+     * @deprecated Please use {@link #withListenerFactories(List)}
+     */
+    @Deprecated(since = "9.9")
     public Http2SolrClient.Builder withListenerFactory(List<HttpListenerFactory> listenerFactory) {
       this.listenerFactory = listenerFactory;
       return this;
@@ -1260,7 +1280,7 @@ public class Http2SolrClient extends HttpSolrClientBase {
 
   /* package-private for testing */
   static SslContextFactory.Client getDefaultSslContextFactory() {
-    String checkPeerNameStr = System.getProperty(HttpClientUtil.SYS_PROP_CHECK_PEER_NAME);
+    String checkPeerNameStr = System.getProperty(SolrHttpConstants.SYS_PROP_CHECK_PEER_NAME);
     boolean sslCheckPeerName = !"false".equalsIgnoreCase(checkPeerNameStr);
 
     SslContextFactory.Client sslContextFactory = new SslContextFactory.Client(!sslCheckPeerName);
