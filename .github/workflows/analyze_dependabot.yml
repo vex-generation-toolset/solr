@@ -27,7 +27,8 @@ jobs:
       - name: Find vulnerable dependencies
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          # A token with permissions to trigger workflows in the target repository
+          GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
           UPDATED_DEPENDENCIES: ${{ steps.dependabot.outputs.updated-dependencies-json }}
         run: |
           jq --compact-output '.[]' <<<"$UPDATED_DEPENDENCIES" | while read -r dependency; do
