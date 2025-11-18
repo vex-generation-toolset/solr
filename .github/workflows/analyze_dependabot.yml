@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: Apache-2.0
+name: analyze_dependabot.yml
+on:
+  pull_request:
+    branches:
+      - branch_9_10
+
+# Disable all permissions by default.
+# Each job must explicitly declare the permissions it needs.
+permissions: { }
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    # Make sure both the PR author and the event actor are Dependabot
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Fetch Dependabot Metadata
+        id: dependabot
+        uses: ppkarwasz/fetch-metadata@14da1d746fb4c6f05dbc353e4fd619a1065c8ff6 # 0.1.0
+        with:
+          github-token: ${{ github.token }}
+
+      - name: Find vulnerable dependencies
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPDATED_DEPENDENCIES: ${{ steps.dependabot.outputs.updated-dependencies-json }}
+        run: |
+          jq --compact-output '.[]' <<<"$UPDATED_DEPENDENCIES" | while read -r dependency; do
+            # Extract the dependency name and version
+            dependency_name=$(jq --raw-output '.dependencyName' <<<"$dependency")
+            prev_version=$(jq --raw-output '.prevVersion' <<<"$dependency")
+          
+            # Check if there are any security advisories for this dependency
+            curl -L \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/advisories?ecosystem=maven&package_name=${dependency_name}@{prev_version}" \
+              | jq --compact-output '.[]' | while read -r advisory; do
+                cve_id=$(jq --raw-output '.cveId' <<<"$advisory")
+                if [[ "$cve_id" != "null" ]]; then
+                  echo "Vulnerable dependency found: $dependency_name (previous version: $prev_version) - CVE: $cve_id"
+                  gh workflow run generate-root-cause.yaml \
+                    -R vex-generation-toolset/callgraph-metadata \
+                    -f artifact="$dependency_name:$prev_version" \
+                    -f cve="$cve_id"
+                fi
+          done
