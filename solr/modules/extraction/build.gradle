@@ -34,8 +34,8 @@ dependencies {
   // For 'local' Tika backend
   implementation 'org.apache.poi:poi'
   implementation 'org.apache.poi:poi-ooxml'
-  implementation 'org.apache.tika:tika-core:1.28.5'
-  implementation ('org.apache.tika:tika-parsers:1.28.5', {
+  implementation 'org.apache.tika:tika-core:2.0.0'
+  implementation ('org.apache.tika:tika-parsers:2.0.0', {
     exclude group: 'org.apache.cxf', module: 'cxf-rt-rs-client'
     exclude group: 'org.quartz-scheduler', module: 'quartz'
     exclude group: 'xml-apis', module: 'xml-apis'
