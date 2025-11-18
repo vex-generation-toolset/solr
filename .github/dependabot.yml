@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"   # required but ignored if limit=0
+    target-branch: "branch_9_10"
+    # Only creates PRs when there are security updates
+    # Allow 1 PR to enable Dependabot
+    open-pull-requests-limit: 1
