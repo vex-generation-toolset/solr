@@ -34,8 +34,8 @@ dependencies {
   // For 'local' Tika backend
   implementation 'org.apache.poi:poi'
   implementation 'org.apache.poi:poi-ooxml'
-  implementation 'org.apache.tika:tika-core'
-  implementation ('org.apache.tika:tika-parsers', {
+  implementation 'org.apache.tika:tika-core:1.28.5'
+  implementation ('org.apache.tika:tika-parsers:1.28.5', {
     exclude group: 'org.apache.cxf', module: 'cxf-rt-rs-client'
     exclude group: 'org.quartz-scheduler', module: 'quartz'
     exclude group: 'xml-apis', module: 'xml-apis'
@@ -52,4 +52,8 @@ dependencies {
   testImplementation 'junit:junit'
   testImplementation 'org.testcontainers:testcontainers'
   testImplementation 'com.carrotsearch.randomizedtesting:randomizedtesting-runner'
+
+  // Pinned dependencies for security reasons
+  runtimeOnly 'org.apache.james:apache-mime4j-core:0.8.4'
+  runtimeOnly 'org.apache.james:apache-mime4j-dom:0.8.4'
 }
