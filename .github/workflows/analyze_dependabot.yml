@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     # Make sure both the PR author and the event actor are Dependabot
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.actor == 'dependabot[bot]'
+    permissions:
+      actions: write
 
     steps:
       - name: Fetch Dependabot Metadata
