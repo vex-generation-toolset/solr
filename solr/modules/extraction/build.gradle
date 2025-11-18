@@ -54,6 +54,6 @@ dependencies {
   testImplementation 'com.carrotsearch.randomizedtesting:randomizedtesting-runner'
 
   // Pinned dependencies for security reasons
-  runtimeOnly 'org.apache.james:apache-mime4j-core:0.8.4'
-  runtimeOnly 'org.apache.james:apache-mime4j-dom:0.8.4'
+  runtimeOnly 'org.apache.james:apache-mime4j-core:0.8.10'
+  runtimeOnly 'org.apache.james:apache-mime4j-dom:0.8.10'
 }
