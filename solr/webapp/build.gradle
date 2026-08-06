@@ -64,6 +64,21 @@ task syncJSClientSourceCode(type: Sync) {
   preserve {
     include "node_modules/**"
   }
+
+  // The OpenAPI generator declares @babel/cli as a runtime dependency, although it only builds
+  // the client and is not among the packages browserify bundles into the shipped file. Left
+  // alone it makes "npm install --omit=dev" pull in the whole Babel tree, and the SBOM of the
+  // bundle claim some seventy packages that are not in it.
+  doLast {
+    def manifestFile = file("${jsClientWorkspace}/package.json")
+    def manifest = new JsonSlurper().parse(manifestFile)
+    def misplaced = manifest.dependencies?.keySet()?.findAll { it.startsWith('@babel/') } ?: []
+    if (misplaced) {
+      misplaced.each { manifest.devDependencies[it] = manifest.dependencies.remove(it) }
+      manifestFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(manifest)) + "\n"
+      logger.lifecycle("Moved ${misplaced.join(', ')} to devDependencies: build-only tooling")
+    }
+  }
 }
 
 task jsClientDownloadDeps(type: NpmTask) {
