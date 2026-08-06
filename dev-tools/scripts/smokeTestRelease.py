@@ -377,7 +377,7 @@ def testOpenApi(version, openApiDirUrl):
       specFound = True
 
   if not specFound:
-    raise RuntimeError('Did not see %s in %s' % expectedSpecFileName, openApiDirUrl)
+    raise RuntimeError('Did not see %s in %s' % (expectedSpecFileName, openApiDirUrl))
 
 
 def testChangelogMd(dir, version):
