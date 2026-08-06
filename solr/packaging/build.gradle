@@ -75,75 +75,91 @@ dependencies {
   }
 }
 
+// Everything both distributions contain. Each adds its own CycloneDX BOM as "bom.json" below, so
+// this deliberately holds no BOM: if the full distribution inherited the slim one it would end up
+// with two "bom.json" entries and it would be up to the extraction tool which one landed on disk.
+def commonDistContents = copySpec {
+  from(rootDir, {
+    include "LICENSE.txt"
+    include "NOTICE.txt"
+    include "CHANGELOG.md"
+  })
+
+  from(project(":solr").projectDir, {
+    include "bin/**"
+    include "licenses/**"
+    exclude "licenses/README.committers.txt"
+  })
+
+  from(projectDir, {
+    include "README.txt"
+  })
+
+  from ('static/lib', {
+    into 'lib'
+  })
+
+  from(configurations.example, {
+    into "example"
+  })
+
+  from(configurations.server, {
+    into "server"
+  })
+
+  from(configurations.docs, {
+    into "docs"
+  })
+
+  from(configurations.docker, {
+    into "docker"
+    filesMatching([
+        "scripts/**",
+    ]) { copy ->
+      copy.setMode(0755)
+    }
+  })
+
+  // Manually correct posix permissions (matters when packaging on Windows).
+  filesMatching([
+      "**/*.sh",
+      "**/bin/post",
+      "**/bin/postlogs",
+      "**/bin/solr",
+      "**/bin/init.d/solr",
+  ]) { copy ->
+    copy.setMode(0755)
+  }
+}
+
 distributions {
   slim {
     distributionBaseName = 'solr'
     distributionClassifier = "slim"
     contents {
+      with commonDistContents
 
-      from(rootDir, {
-        include "LICENSE.txt"
-        include "NOTICE.txt"
-        include "CHANGELOG.md"
-      })
-
-      from(project(":solr").projectDir, {
-        include "bin/**"
-        include "licenses/**"
-        exclude "licenses/README.committers.txt"
-      })
-
-      from(projectDir, {
-        include "README.txt"
-      })
-
-      from ('static/lib', {
-        into 'lib'
-      })
-
-      from(configurations.example, {
-        into "example"
-      })
-
-      from(configurations.server, {
-        into "server"
-      })
-
-      from(configurations.docs, {
-        into "docs"
-      })
-
-      from(configurations.docker, {
-        into "docker"
-        filesMatching([
-            "scripts/**",
-        ]) { copy ->
-          copy.setMode(0755)
-        }
-      })
-
-      // Manually correct posix permissions (matters when packaging on Windows).
-      filesMatching([
-          "**/*.sh",
-          "**/bin/post",
-          "**/bin/postlogs",
-          "**/bin/solr",
-          "**/bin/init.d/solr",
-      ]) { copy ->
-        copy.setMode(0755)
+      // Include CycloneDX BOM
+      from(cyclonedxDir) {
+        include 'bom-slim.json'
+        rename 'bom-slim.json', 'bom.json'
       }
-
     }
   }
   full {
     distributionBaseName = 'solr'
     contents {
-      // Build on-top of the slim distribution
-      with(distributions.slim.getContents())
+      with commonDistContents
 
       from(configurations.modules, {
         into "modules"
       })
+
+      // Include CycloneDX BOM
+      from(cyclonedxDir) {
+        include 'bom-full.json'
+        rename 'bom-full.json', 'bom.json'
+      }
 
       from(configurations.prometheusExporter, {
         into "prometheus-exporter"
@@ -167,10 +183,12 @@ distributions {
 }
 
 installFullDist {
+  dependsOn 'cyclonedx'
   into distDir
 }
 
 installSlimDist {
+  dependsOn 'cyclonedx'
   into slimDistDir
 }
 
@@ -209,10 +227,12 @@ task dev {
 }
 
 fullDistTar {
+  dependsOn 'cyclonedx'
   compression = Compression.GZIP
 }
 
 slimDistTar {
+  dependsOn 'cyclonedx'
   compression = Compression.GZIP
 }
 

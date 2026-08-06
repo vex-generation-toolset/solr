@@ -27,6 +27,7 @@ plugins {
   id 'net.ltgt.errorprone' version '5.1.0' apply false
   id 'com.diffplug.spotless' version '7.2.1' apply false
   id 'com.github.node-gradle.node' version '7.1.0' apply false
+  id 'org.cyclonedx.bom' version '3.0.2' apply false
   id 'dev.logchange' version '1.19.15'
 }
 
@@ -201,6 +202,7 @@ apply from: file('gradle/hacks/turbocharge-jvm-opts.gradle')
 apply from: file('gradle/hacks/dummy-outputs.gradle')
 
 apply from: file('gradle/solr/packaging.gradle')
+apply from: file('gradle/solr/sbom.gradle')
 apply from: file('gradle/solr/solr-forbidden-apis.gradle')
 
 apply from: file('gradle/ant-compat/solr.post-jar.gradle')
