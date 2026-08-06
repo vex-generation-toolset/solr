@@ -56,12 +56,15 @@ configurations {
   changesHtml
   openApiSpecFile
   docker
+  sbom
 }
 
 dependencies {
   changesHtml project(path: ":solr:documentation", configuration: "changesHtml")
   openApiSpecFile project(path: ":solr:api", configuration: "openapiSpec")
   docker project(path: ':solr:docker', configuration: 'packagingOfficial')
+  // The CycloneDX BOMs of the binary distributions, named after the archive each describes
+  sbom project(path: ":solr:packaging", configuration: "sbom")
 }
 
 def fullDistTarTask = rootProject.getTasksByName("fullDistTar", true)[0]
@@ -82,6 +85,9 @@ task computeChecksums(type: Checksum) {
   }
   dependsOn configurations.openApiSpecFile
   files += configurations.openApiSpecFile
+
+  dependsOn configurations.sbom
+  files += configurations.sbom
 
   outputDir = file("${buildDir}/checksums")
 }
@@ -105,11 +111,20 @@ task signOpenApiSpec(type: Sign) {
   }
 }
 
+task signSboms(type: Sign) {
+  dependsOn configurations.sbom
+  // These are not artifacts either, see signOpenApiSpec above
+  doFirst {
+    sign(*configurations.sbom.files.toArray(new File[0]))
+  }
+}
+
 task signReleaseArchives(type: Sync) {
   from tasks.signFullBinaryTgz
   from tasks.signSlimBinaryTgz
   from tasks.signSourceTgz
   from tasks.signOpenApiSpec
+  from tasks.signSboms
 
   into "${buildDir}/signatures"
 }
@@ -154,6 +169,7 @@ task assembleRelease(type: Sync) {
   from tasks.assembleSourceTgz
   from fullDistTarTask
   from slimDistTarTask
+  from configurations.sbom
 
   from(tasks.computeChecksums, {
     exclude { it.file.getName().contains("openapi") }
