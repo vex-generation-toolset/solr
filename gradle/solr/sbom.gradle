@@ -214,15 +214,20 @@ configure(project(':solr:packaging')) {
           matcher ? URLDecoder.decode(matcher.group(1), 'UTF-8') : null
       }
 
-      // 3. Removed components
-      def removedRefs = json.components.findAll {
-          it.purl =~ /[?&]type=pom(&|$)/
-      }.collect { it.'bom-ref' } as Set
-
-      // 4. Solr components
       Map<String, String> artifactIdByPath = rootProject.allprojects.collectEntries {
           [(it.path): it.base.archivesName.get()]
       }
+
+      // 3. Removed components
+      def removedRefs = json.components.findAll {
+          def projectPath = projectPathOf(it.purl)
+          it.purl =~ /[?&]type=pom(&|$)/ ||
+              // Container projects such as the root project publish no archive of their own, so
+              // there is no artifactId to name them by and nothing of them ships.
+              (projectPath != null && !artifactIdByPath[projectPath])
+      }.collect { it.'bom-ref' } as Set
+
+      // 4. Solr components
       json.components = json.components.collect { Map<String, Object> component ->
           def projectPath = projectPathOf(component.purl)
           // Skip external components and those about to be removed
@@ -230,6 +235,12 @@ configure(project(':solr:packaging')) {
               return component
           }
           def artifactId = artifactIdByPath[projectPath]
+          if (!artifactId) {
+              // Cannot happen: step 3 drops these. Guards against a nameless component with an
+              // invalid purl, which purl parsers silently reinterpret instead of rejecting.
+              throw new GradleException("No archive name for the Gradle project ${projectPath}, " +
+                  "which the SBOM lists as a component.")
+          }
           def repositoryUrlQualifier = component.version.endsWith("-SNAPSHOT") ? APACHE_SNAPSHOTS_QUALIFIER : ''
           def purl = "pkg:maven/${component.group}/${artifactId}@${component.version}?type=jar${repositoryUrlQualifier}".toString()
           rewrittenRefs[component.'bom-ref'] = purl
